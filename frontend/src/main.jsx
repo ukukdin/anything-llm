@@ -116,6 +116,17 @@ const router = createBrowserRouter([
         },
       },
       {
+        path: "/settings/reranker-preference",
+        lazy: async () => {
+          const { default: RerankerPreference } = await import(
+            "@/pages/GeneralSettings/RerankerPreference"
+          );
+          return {
+            element: <AdminRoute Component={RerankerPreference} />,
+          };
+        },
+      },
+      {
         path: "/settings/vector-database",
         lazy: async () => {
           const { default: GeneralVectorDatabase } = await import(

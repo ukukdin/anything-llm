@@ -593,8 +593,38 @@ function humanFileSize(bytes, si = false, dp = 1) {
   return bytes.toFixed(dp) + " " + units[u];
 }
 
+/**
+ * Returns the configured embedding reranker instance based on
+ * the EMBEDDING_RERANKER environment variable. Falls back to the
+ * built-in native (Xenova MS-MARCO MiniLM) reranker.
+ *
+ * Each implementation must expose `rerank(query, documents, { topK })`
+ * and an async `initClient()` / `preload()` no-op for compatibility
+ * with the native reranker.
+ * @returns {{ rerank: Function, initClient: Function, preload: Function }}
+ */
+function getEmbeddingRerankerSelection() {
+  const selection = process.env.EMBEDDING_RERANKER;
+  switch (selection) {
+    case "cohere": {
+      const {
+        CohereEmbeddingReranker,
+      } = require("../EmbeddingRerankers/cohere");
+      return new CohereEmbeddingReranker();
+    }
+    case "native":
+    default: {
+      const {
+        NativeEmbeddingReranker,
+      } = require("../EmbeddingRerankers/native");
+      return new NativeEmbeddingReranker();
+    }
+  }
+}
+
 module.exports = {
   getEmbeddingEngineSelection,
+  getEmbeddingRerankerSelection,
   maximumChunkLength,
   getVectorDbClass,
   getLLMProviderClass,

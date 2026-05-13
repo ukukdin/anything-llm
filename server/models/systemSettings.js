@@ -433,6 +433,13 @@ const SystemSettings = {
       GeminiEmbeddingApiKey: !!process.env.GEMINI_EMBEDDING_API_KEY,
 
       // --------------------------------------------------------
+      // Embedding Reranker Selection Settings & Configs
+      // --------------------------------------------------------
+      EmbeddingReranker: process.env.EMBEDDING_RERANKER || "native",
+      CohereRerankerApiKey: !!process.env.COHERE_RERANKER_API_KEY,
+      CohereRerankerModel: process.env.COHERE_RERANKER_MODEL || "rerank-v3.5",
+
+      // --------------------------------------------------------
       // VectorDB Provider Selection Settings & Configs
       // --------------------------------------------------------
       VectorDB: vectorDB,

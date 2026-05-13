@@ -332,6 +332,20 @@ const KEY_MAPPING = {
     checks: [nonZero],
   },
 
+  // Embedding Reranker Selection Settings
+  EmbeddingReranker: {
+    envKey: "EMBEDDING_RERANKER",
+    checks: [supportedEmbeddingReranker],
+  },
+  CohereRerankerApiKey: {
+    envKey: "COHERE_RERANKER_API_KEY",
+    checks: [isNotEmpty],
+  },
+  CohereRerankerModel: {
+    envKey: "COHERE_RERANKER_MODEL",
+    checks: [isNotEmpty],
+  },
+
   // Vector Database Selection Settings
   VectorDB: {
     envKey: "VECTOR_DB",
@@ -1019,6 +1033,13 @@ function supportedEmbeddingModel(input = "") {
   return supported.includes(input)
     ? null
     : `Invalid Embedding model type. Must be one of ${supported.join(", ")}.`;
+}
+
+function supportedEmbeddingReranker(input = "") {
+  const supported = ["native", "cohere"];
+  return supported.includes(input)
+    ? null
+    : `Invalid Embedding reranker. Must be one of ${supported.join(", ")}.`;
 }
 
 function supportedVectorDB(input = "") {

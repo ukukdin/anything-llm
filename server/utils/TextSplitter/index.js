@@ -161,7 +161,37 @@ class TextSplitter {
         ? 20
         : Number(config?.chunkOverlap),
       chunkHeader: this.stringifyHeader(),
+      separators: TextSplitter.defaultSeparators(),
     });
+  }
+
+  /**
+   * Default separator list passed to Langchain's RecursiveCharacterTextSplitter.
+   * Order matters: the splitter walks the list and uses the first separator that
+   * produces a chunk under the size limit. Sentence-level separators for both
+   * Korean (다./요./니다.) and English are inserted before the word-level fallback
+   * so chunks land on sentence boundaries when possible. Falls back to the
+   * Langchain defaults for whitespace/character splitting at the tail.
+   * @returns {string[]}
+   */
+  static defaultSeparators() {
+    return [
+      "\n\n",
+      "\n",
+      // Korean sentence endings (most common formal/polite/casual)
+      "다. ",
+      "요. ",
+      "까? ",
+      "죠. ",
+      "니다. ",
+      // English sentence endings
+      ". ",
+      "? ",
+      "! ",
+      // Fallbacks
+      " ",
+      "",
+    ];
   }
 
   async splitText(documentText) {
@@ -171,7 +201,7 @@ class TextSplitter {
 
 // Wrapper for Langchain default RecursiveCharacterTextSplitter class.
 class RecursiveSplitter {
-  constructor({ chunkSize, chunkOverlap, chunkHeader = null }) {
+  constructor({ chunkSize, chunkOverlap, chunkHeader = null, separators }) {
     const {
       RecursiveCharacterTextSplitter,
     } = require("@langchain/textsplitters");
@@ -179,11 +209,15 @@ class RecursiveSplitter {
       chunkSize,
       chunkOverlap,
       chunkHeader: chunkHeader ? `${chunkHeader?.slice(0, 50)}...` : null,
+      separators: separators?.length ?? "default",
     });
     this.chunkHeader = chunkHeader;
     this.engine = new RecursiveCharacterTextSplitter({
       chunkSize,
       chunkOverlap,
+      ...(Array.isArray(separators) && separators.length > 0
+        ? { separators }
+        : {}),
     });
   }
 

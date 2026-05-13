@@ -1,7 +1,5 @@
 const { TokenManager } = require("../../../helpers/tiktoken");
-const {
-  NativeEmbeddingReranker,
-} = require("../../../EmbeddingRerankers/native");
+const { getEmbeddingRerankerSelection } = require("../../../helpers");
 
 const CHUNK_SIZE = 25;
 const MAX_TEXT_LENGTH = 1000;
@@ -62,7 +60,7 @@ class ToolReranker {
    */
   async #getReranker() {
     if (!this.reranker) {
-      this.reranker = new NativeEmbeddingReranker();
+      this.reranker = getEmbeddingRerankerSelection();
       await this.reranker.initClient();
     }
     return this.reranker;
