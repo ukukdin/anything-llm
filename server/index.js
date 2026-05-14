@@ -74,6 +74,18 @@ if (!!process.env.ENABLE_HTTPS) {
   require("@mintplex-labs/express-ws").default(app); // load WebSockets in non-SSL mode.
 }
 
+// In dev mode, serve the embed widget assets from frontend/public/embed so a
+// single tunnel pointing at the backend can deliver both the widget script
+// and its API. In production these are copied into server/public by the build.
+if (process.env.NODE_ENV === "development") {
+  app.use(
+    "/embed",
+    express.static(
+      path.resolve(__dirname, "..", "frontend", "public", "embed")
+    )
+  );
+}
+
 app.use("/api", apiRouter);
 systemEndpoints(apiRouter);
 extensionEndpoints(apiRouter);
